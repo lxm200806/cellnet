@@ -1,6 +1,9 @@
 package cellnet
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/bitly/go-simplejson"
+)
 
 type SessionInit struct {
 }
@@ -34,6 +37,11 @@ func (self CloseReason) String() string {
 
 type SessionClosed struct {
 	Reason CloseReason // 断开原因
+}
+
+type SessionMsg struct {
+	OpCode int
+	MessageJson *simplejson.Json
 }
 
 // udp通知关闭,内部使用

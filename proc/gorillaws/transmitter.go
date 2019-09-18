@@ -2,6 +2,7 @@ package gorillaws
 
 import (
 	"encoding/binary"
+	"github.com/bitly/go-simplejson"
 	"github.com/davyxu/cellnet"
 	"github.com/davyxu/cellnet/codec"
 	"github.com/davyxu/cellnet/util"
@@ -42,8 +43,22 @@ func (WSMessageTransmitter) OnRecvMessage(ses cellnet.Session) (msg interface{},
 		msgData := raw[MsgIDSize:]
 
 		msg, _, err = codec.DecodeMessage(int(msgID), msgData)
+	case websocket.TextMessage:
+		sessionMsg := cellnet.SessionMsg{}
+		msg = &sessionMsg
+		json, err2 := simplejson.NewJson(raw)
+		if err2 != nil {
+			err = err2
+			return
+		}
+		opcode, err3 := json.Get("id").Int()
+		if err3 != nil {
+			err = err3
+			return
+		}
+		sessionMsg.OpCode = opcode
+		sessionMsg.MessageJson = json
 	}
-
 	return
 }
 
